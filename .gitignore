@@ -1,0 +1,8 @@
+# IDE settings
+.vscode/*
+
+# Source files
+*.out run
+
+# Test files
+./test/test*
