@@ -1,0 +1,37 @@
+#include <iostream>
+#include <vector>
+ 
+std::vector<int> findMatches(std::string p, std::string t)
+{
+    size_t m = p.size() - 1;
+    size_t n = t.size();
+    std::vector<int> result;
+    
+    for(size_t i = 0, j = 0; i < n; ++i)
+    {
+        while(i < n && j != m && t[i] == p[j])
+        {
+            ++i;
+            ++j;
+        }
+ 
+        if(j == m)
+        {
+            result.push_back(i-m);
+            j = 0;
+        }
+    }
+    return result;
+}
+ 
+int main(int argc, char *argv[])
+{
+    std::string p = "abc";
+    std::string t = "abcaaaabcddabcdd";
+    
+    std::vector<int> result = findMatches(p, t);
+ 
+    std::cout << std::endl;
+    for(std::vector<int>::const_iterator it = result.begin(); it != result.end(); ++it)
+        std::cout << *it << std::endl;
+}
