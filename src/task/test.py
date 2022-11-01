@@ -4,7 +4,7 @@ import re
 
 file = open("./source.txt", "r")
 s = file.read()
-import re
+file.close()
 
 result = [m.start() for m in re.finditer('секс', s)]
 
