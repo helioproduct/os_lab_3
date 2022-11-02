@@ -45,9 +45,9 @@ void *search_substring(void *arguments)
         {
             *result = i - m;
             j = 0;
-            printf("found substring at %d\n", i);
+            printf("%d\n", args->offset + i - m);
         }
-        if (0 < j && i == args->chunk_size - 1) 
+        if (j > 0 && i == args->chunk_size) 
         {   
             if (args->offset + args->chunk_size + (m - j) > args->file_size) 
             {
@@ -66,7 +66,7 @@ void *search_substring(void *arguments)
         else 
         {
             i++;
-            j=0;
+            j = 0;
         }
     }
     free(chunk);
@@ -82,6 +82,10 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    // argv[1] = "test2";
+    // argv[2] = "string";
+    // argv[3] = "2";
+
     int source_fd = open(argv[1], O_RDONLY);
     char *substring = argv[2];
     const int THREAD_MAX = atoi(argv[3]);
@@ -96,6 +100,21 @@ int main(int argc, char **argv)
     lseek(source_fd, 0, SEEK_SET);
 
     const size_t CHUNK_SIZE = ceil(file_size / (double) THREAD_MAX);
+
+    // for (int i = 0; i < THREAD_MAX; i++)
+    // {
+    //     off_t offset = i * CHUNK_SIZE;
+    //     ARGS *args = (ARGS*)malloc(sizeof(ARGS));
+    
+    //     args->source_fd = source_fd;
+    //     args->substring = substring;
+    //     args->offset = i * CHUNK_SIZE;
+    //     args->chunk_size = CHUNK_SIZE;
+    //     args->file_size = file_size;
+        
+    //     search_substring(args);
+    // }
+
 
     pthread_t th[THREAD_MAX];
     for (int i = 0; i < THREAD_MAX; i++)
