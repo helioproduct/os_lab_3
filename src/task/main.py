@@ -3,13 +3,13 @@
 import re
 from sys import argv
 
-
 file = open(argv[1], "r")
 s = file.read()
 file.close()
 
-result = [m.start() for m in re.finditer(argv[2], s)]
+substr = argv[2]
+ 
+result = [_.start() for _ in re.finditer(substr, s)] 
 
-for i in result:
-    print(i)
-
+for x in result:
+    print(x)

@@ -6,6 +6,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "vector.c"
+
 typedef struct arguments 
 {
     int source_fd;
@@ -13,20 +15,20 @@ typedef struct arguments
     off_t offset;
     size_t chunk_size;
     size_t file_size;
-} ARGS;
+} 
+ARGS;
+
 
 void *search_substring(void *arguments)
 {
     ARGS *args = arguments;
-    int *result = malloc(sizeof(int));
-    *result = -1;
 
-    int *count = malloc(sizeof(int));
+    vector *result = init_vector(1);
 
     char *chunk = (char*)malloc(args->chunk_size);
     size_t bytes_read;
     bytes_read = pread(args->source_fd, chunk, args->chunk_size, args->offset);
-    
+ 
     size_t m = strlen(args->substring);
     if (m > args->file_size)
     {
@@ -43,9 +45,8 @@ void *search_substring(void *arguments)
         }
         if (j == m)
         {
-            *result = i - m;
+            push_back(result, args->offset + i - m);         
             j = 0;
-            printf("%d\n", args->offset + i - m);
         }
         if (j > 0 && i == args->chunk_size) 
         {   
@@ -70,6 +71,7 @@ void *search_substring(void *arguments)
         }
     }
     free(chunk);
+    
     return result;
 }
 
@@ -85,7 +87,7 @@ int main(int argc, char **argv)
     int source_fd = open(argv[1], O_RDONLY);
     char *substring = argv[2];
     const int THREAD_MAX = atoi(argv[3]);
-    
+
     if (source_fd == -1)
     {
         perror("Source file open error\n");
@@ -112,16 +114,22 @@ int main(int argc, char **argv)
         if (pthread_create(th + i, NULL, &search_substring, args) != 0)
         {
             perror("Creating thread error\n");
-            return i;
+            return -i;
         }
     }
 
     for (int i = 0; i < THREAD_MAX; i++) 
     {
-        if (pthread_join(th[i], NULL) != 0)
+        vector *result;
+        if (pthread_join(th[i], (void**) &result) != 0)
         {
-            return 2 * i;
+            return -2 * i;
         }
+        for (int j = 0; j < result->total; j++)
+        {
+            printf("%d\n", vector_get(result, j));
+        }
+        destroy_vector(result);
     }
 
     return 0;

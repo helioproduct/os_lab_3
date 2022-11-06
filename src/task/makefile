@@ -5,4 +5,4 @@ run: main.c
 
 clean:
 	rm -f *.out *.o run
-	rm -f *.out run *.o
+	rm -f *.out run *.o	
